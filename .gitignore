@@ -1,8 +1,29 @@
+# Rust artifacts
 /target/
+/lstt/src-tauri/target/
 
-/models/*.bin
-/models/*.ggml
+# Audio and Model Files
+*.bin
+*.ggml
+*.pt
+*.safetensors
 *.wav
+/models/
 
+# OS Files
 .DS_Store
+.idea/
+.env
 Thumbs.db
+
+# Raw ML Repositories
+/NigerianAccentedEnglish/
+/Hausa-ASR/
+
+# Python & External Tools
+/venv/
+/tools/whisper/
+/tools/whisper.cpp/
+__pycache__/
+
+/tools
