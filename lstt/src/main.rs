@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use whisper_rs::{WhisperContext, WhisperContextParameters};
+use whisper_rs::{FullParams, SamplingStrategy, WhisperContext, WhisperContextParameters};
 use std::path::Path;
 
 fn main() {
@@ -21,7 +21,7 @@ fn main() {
     let ctx_params = WhisperContextParameters::default();
     
     // We bind the context to _ctx. 
-    let _ctx = match WhisperContext::new_with_params(model_path, ctx_params) {
+    let ctx = match WhisperContext::new_with_params(model_path, ctx_params) {
         Ok(context) => {
             println!("SUCCESS: Nigerian Accented English model loaded efficiently!");
             context
@@ -32,5 +32,24 @@ fn main() {
         }
     };
 
-    println!("Engine test complete. Model is ready for audio!");
+    // Create a state for execution
+    // The state manages the scratch buffers and context windows required during transcription.
+    let mut state = match ctx.create_state() {
+        Ok(s) => s,
+        Err(e) => {
+            eprint!("Failed to create whisper state: {}", e);
+            return;
+        }
+    };
+
+    let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
+
+    params.set_translate(false);
+    params.set_language(Some("en"));
+    params.set_print_special(false);
+    params.set_print_progress(false);
+    params.set_print_realtime(false);
+    params.set_print_timestamps(true);
+
+    println!("Engine is fully primed and ready for PCM audio streams!");
 }
