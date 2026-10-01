@@ -1,8 +1,0 @@
-/target/
-
-/models/*.bin
-/models/*.ggml
-*.wav
-
-.DS_Store
-Thumbs.db

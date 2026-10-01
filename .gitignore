@@ -1,29 +1,28 @@
-# Rust artifacts
-/target/
-/lstt/src/target/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Audio and Model Files
-*.bin
-*.ggml
-*.pt
-*.safetensors
-*.wav
-/models/
+node_modules
+dist
+dist-ssr
+*.local
 
-# OS Files
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 .env
 Thumbs.db
-
-# Raw ML Repositories
-/NigerianAccentedEnglish/
-/Hausa-ASR/
-
-# Python & External Tools
-/venv/
-/tools/whisper/
-/tools/whisper.cpp/
-__pycache__/
-
-/tools
+.vite
+.vscode
