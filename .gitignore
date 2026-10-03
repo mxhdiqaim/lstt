@@ -26,3 +26,8 @@ dist-ssr
 Thumbs.db
 .vite
 .vscode
+
+/src-tauri/models/
+/src-tauri/test.wav
+*.bin
+*.wav
