@@ -254,8 +254,10 @@ async fn stop_recording_and_transcribe(state: State<'_, AppState>) -> Result<Str
     params.set_print_realtime(false);
     params.set_print_timestamps(false);
 
-    // Initial prompt for proper capitalisation and punctuation
-    params.set_initial_prompt("Hello, my name is Mahdi. I live in Abuja, Nigeria. Let's record this text.");
+    // This primes the engine's text-prediction layer to expect Nigerian phrasing and locations
+    params.set_initial_prompt(
+        "Hello Mahdi, welcome to Abuja, Nigeria. Wetin dey happen? How far? Let's record this text."
+    );
 
     println!("Running Whisper inference on microphone audio...");
 
