@@ -6,13 +6,27 @@ function App() {
   const [transcription, setTranscription] = useState<string>("");
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
+
+  // Helper function to copy text to macOS system clipboard
+  const copyToClipboard = async (textToCopy: string) => {
+    if (!textToCopy || textToCopy.startsWith("[")) return;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy to macOS system clipboard:", err);
+    }
+  };
 
   const handleToggleRecording = async () => {
     if (!isRecording) {
       try {
         await invoke("start_recording");
         setIsRecording(true);
-        setTranscription("Listening... Speak into your microphone.");
+        setTranscription("");
       } catch (error) {
         console.error("Failed to start recording:", error);
         setTranscription(`Error: ${error}`);
@@ -20,11 +34,13 @@ function App() {
     } else {
       setIsRecording(false);
       setIsProcessing(true);
-      setTranscription("Processing speech and running model inference...");
 
       try {
         const result = await invoke<string>("stop_recording_and_transcribe");
         setTranscription(result);
+        
+        // Auto-copy transcription to macOS system clipboard
+        await copyToClipboard(result);
       } catch (error) {
         console.error("Transcription error:", error);
         setTranscription(`Error: ${error}`);
@@ -36,7 +52,7 @@ function App() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-slate-900">
-      <div className="max-w-2xl w-full flex flex-col gap-8">
+      <div className="max-w-2xl w-full flex flex-col gap-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-slate-100 mb-2">
             Local Speech-to-Text Engine
@@ -46,6 +62,7 @@ function App() {
           </p>
         </div>
 
+        {/* Record Button */}
         <div className="flex justify-center">
           <button
             onClick={handleToggleRecording}
@@ -71,13 +88,44 @@ function App() {
           </button>
         </div>
 
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700 min-h-[180px] shadow-lg">
-          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
-            Live Output
-          </h3>
-          <p className="text-lg leading-relaxed text-slate-200 whitespace-pre-wrap">
-            {transcription || "Click 'Start Recording' and speak into your microphone..."}
-          </p>
+        {/* Live Output Section */}
+        <div className="bg-slate-800 rounded-xl p-3 border border-slate-700 shadow-lg flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Editable Output
+            </h3>
+            
+            <div className="flex items-center gap-2">
+              {copied && (
+                <span className="text-xs text-emerald-400 font-medium transition-all">
+                  ✓ Copied to macOS Clipboard
+                </span>
+              )}
+              {transcription && (
+                <button
+                  onClick={() => copyToClipboard(transcription)}
+                  className="text-xs px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded transition-colors"
+                >
+                  Copy Text
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Editable Text Area */}
+          <textarea
+            value={transcription}
+            onChange={(e) => setTranscription(e.target.value)}
+            disabled={isRecording || isProcessing}
+            placeholder={
+              isRecording
+                ? "Listening... Speak into your microphone."
+                : isProcessing
+                ? "Processing speech and running model inference..."
+                : "Click 'Start Recording' to begin speaking, or type/edit text here..."
+            }
+            className="w-full h-48 p-4 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y text-base leading-relaxed"
+          />
         </div>
       </div>
     </div>
